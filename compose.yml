@@ -1,0 +1,43 @@
+services:
+  # ----- App Runner (x86_64) -----
+  langfuse:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/langfuse-web:latest
+    platform: linux/amd64
+    container_name: langfuse-web
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM --platform=linux/amd64 langfuse/langfuse:3
+
+  # ----- ECS Fargate (ARM64) -----
+  langfuse-worker:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/langfuse-worker:latest
+    platform: linux/arm64
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM --platform=linux/arm64 langfuse/langfuse-worker:3
+
+  clickhouse:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/clickhouse:latest
+    platform: linux/arm64
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM --platform=linux/arm64 clickhouse/clickhouse-server:24
+
+  # --- Optional: ClickHouse + S3 Disk (ARM64) ---
+  # clickhouse-s3disk:
+  #   image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/clickhouse:latest
+  #   platform: linux/arm64
+  #   build:
+  #     context: .
+  #     dockerfile_inline: |
+  #       FROM --platform=linux/arm64 ghcr.io/tubone24/clickhouse-server-s3disk:latest
+  grafana:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/grafana:latest
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM --platform=linux/amd64 grafana/grafana:latest
